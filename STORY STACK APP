@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Story Stack</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Lora", serif;
+            background: url('https://www.transparenttextures.com/patterns/cubes.png'), #f0f8f5;
+            background-size: cover;
+        }
+        .navbar {
+            background-color: #2e8b57;
+            font-weight: bold;
+            font-size: 50px;
+            padding: 10px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+        .container {
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .box-container {
+            padding: 20px;
+            background-color: #3cb371;
+            color: black;
+            border-radius: 10px;
+            margin: 10px;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .box-container h2 {
+            color: beige;
+        }
+        .box-container button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background-color: beige;
+            border: none;
+            cursor: pointer;
+        }
+        .box-container .date,
+        .box-container .duration {
+            font-size: 14px;
+            color: white;
+            margin-top: 5px;
+        }
+        #add-button {
+            border-radius: 50%;
+            background-color: #2e8b57;
+            color: white;
+            border: none;
+            padding: 20px;
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            font-size: larger;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .popup-overlay {
+            background-color: rgba(0, 0, 0, 0.8);
+            height: 100%;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            position: fixed;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-box {
+            background: url('https://www.transparenttextures.com/patterns/black-linen.png'), #2e8b57;
+            width: 40%;
+            padding: 40px;
+            border-radius: 10px;
+            position: relative;
+        }
+        .popup-box input,
+        .popup-box textarea {
+            background: transparent;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 20px;
+            border: none;
+            border-bottom: 2px solid black;
+        }
+        .popup-box input[type="date"],
+        .popup-box input[type="number"] {
+            border-bottom: none;
+            border: 2px solid black;
+        }
+        .popup-box textarea {
+            border: 2px solid black;
+        }
+        .popup-box input::placeholder,
+        .popup-box textarea::placeholder {
+            color: black;
+        }
+        .popup-box button {
+            background-color: black;
+            color: beige;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .popup-box input:focus,
+        .popup-box textarea:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">Story Stack</div>
+    <div class="container">
+        <div class="box-container">
+            <h2>The Great Gatsby</h2>
+            <h4>F. Scott Fitzgerald</h4>
+            <p>A tragic love story set in the Jazz Age, it explores themes of wealth, excess, and the American dream.</p>
+            <p class="date">Date Added: 2024-07-07</p>
+            <p class="duration">Duration: 7 days</p>
+            <button onclick="removebook(event)">DELETE</button>
+        </div>
+    </div>
+    <div class="popup-overlay">
+        <div class="popup-box">
+            <form>
+                <input type="text" id="book-name" placeholder="BOOK NAME">
+                <input type="text" id="author-name" placeholder="AUTHOR NAME">
+                <textarea id="description" placeholder="Add a short description"></textarea>
+                <input type="date" id="date-added" placeholder="Date Added">
+                <input type="number" id="reading-duration" placeholder="Duration (in days)">
+                <button id="add-popup">ADD</button>
+                <button id="del-popup">CANCEL</button>
+            </form>
+        </div>
+    </div>
+    <button id="add-button">+</button>
+    <script>
+        var popupoverlay = document.querySelector(".popup-overlay");
+        var popupbox = document.querySelector(".popup-box");
+        var addpopupbutton = document.getElementById("add-button");
+
+        addpopupbutton.addEventListener("click", function() {
+            popupoverlay.style.display = "flex";
+            popupbox.style.display = "block";
+        });
+
+        var cancelpopup = document.getElementById("del-popup");
+        cancelpopup.addEventListener("click", function(event) {
+            event.preventDefault();
+            popupoverlay.style.display = "none";
+            popupbox.style.display = "none";
+        });
+
+        var addbookcontainer = document.querySelector(".container");
+        var addbook = document.getElementById("add-popup");
+        var addbookname = document.getElementById("book-name");
+        var addbookauthor = document.getElementById("author-name");
+        var addbookdescription = document.getElementById("description");
+        var adddateadded = document.getElementById("date-added");
+        var addreadingduration = document.getElementById("reading-duration");
+
+        addbook.addEventListener("click", function(event) {
+            event.preventDefault();
+            var div = document.createElement("div");
+            div.setAttribute("class", "box-container");
+            div.innerHTML = `<h2>${addbookname.value}</h2>
+                             <h4>${addbookauthor.value}</h4>
+                             <p>${addbookdescription.value}</p>
+                             <p class="date">Date Added: ${adddateadded.value}</p>
+                             <p class="duration">Duration: ${addreadingduration.value} days</p>
+                             <button onclick="removebook(event)">DELETE</button>`;
+            addbookcontainer.append(div);
+            popupoverlay.style.display = "none";
+            popupbox.style.display = "none";
+        });
+
+        function removebook(event) {
+            event.target.parentElement.remove();
+        }
+    </script>
+</body>
+</html>
